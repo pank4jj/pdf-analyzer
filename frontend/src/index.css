@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+
+@theme {
+
+  --color-canvas: #090909;
+  --color-surface-1: #141414;
+  --color-surface-2: #1c1c1c;
+  --color-hairline: #262626;
+  --color-hairline-soft: #1a1a1a;
+
+  --color-ink: #ffffff;
+  --color-ink-muted: #999999;
+
+  --color-accent: #0099ff;
+
+  --color-gradient-violet: #6a4cf5;
+  --color-gradient-magenta: #d44df0;
+  --color-gradient-orange: #ff7a3d;
+  --color-gradient-coral: #ff5577;
+
+
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+
+  --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-display: "Inter", system-ui, sans-serif;
+
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 15px;
+  --radius-xl: 20px;
+  --radius-xxl: 30px;
+  --radius-pill: 100px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+
+  ::selection {
+    background: rgba(0, 153, 255, 0.25);
+    color: var(--color-ink);
+  }
+}
+
+/* === Custom utilities (DESIGN.md component tokens) === */
+
+/* White pill — primary CTA */
+@utility btn-primary {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+@utility btn-primary-hover {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+/* Charcoal pill — secondary action */
+@utility btn-secondary {
+  background: var(--color-surface-1);
+  color: var(--color-ink);
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+@utility btn-secondary-hover {
+  background: var(--color-surface-2);
+}
+
+/* Translucent pill — on gradient/busy backgrounds */
+@utility btn-translucent {
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+  border-radius: var(--radius-xxl);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+
+/* Focus ring — accent blue halo, used on inputs */
+@utility focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(0, 153, 255, 0.3);
+}
+
+/* Card surfaces */
+@utility card-surface {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-hairline-soft);
+  border-radius: var(--radius-xl);
+}
+@utility card-featured {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-xl);
+}
+
+/* Animations */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+@utility animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+@utility animate-spin-slow {
+  animation: spin 0.7s linear infinite;
+}
