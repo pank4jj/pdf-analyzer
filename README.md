@@ -2,6 +2,8 @@
 
 I got tired of reading through 80-page PDFs just to find one answer, so I built this — upload a document, ask questions in plain English, get answers back instantly.
 
+Vercel Link - https://documind-lime.vercel.app/
+
 Under the hood it's a MERN stack app that passes your PDF to Google Gemini and returns answers through a chat interface. PDFs are stored on Cloudinary so the app works on serverless/ephemeral hosts too.
 
 ![stack](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)
