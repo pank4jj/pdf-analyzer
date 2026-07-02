@@ -51,7 +51,31 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Field label="Email" type="email" value={email} onChange={setEmail} placeholder="you@example.com" />
-          <Field label="Password" type="password" value={password} onChange={setPassword} placeholder="••••••••" />
+          <div>
+            <div className="mb-1.5 flex items-center justify-between">
+              <label className="text-[14px] font-medium" style={{ color: "var(--color-ink-muted)" }}>Password</label>
+              <Link to="/forgot-password" className="text-[13px] no-underline hover:underline" style={{ color: "var(--color-accent)" }}>
+                Forgot password?
+              </Link>
+            </div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="w-full rounded-[10px] px-4 py-3 text-[15px] text-white placeholder-gray-500 outline-none transition"
+              style={{ background: "var(--color-surface-2)", border: "1px solid var(--color-hairline-soft)" }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--color-accent)";
+                e.target.style.boxShadow = "0 0 0 1px rgba(0,153,255,0.25)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--color-hairline-soft)";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </div>
           <button type="submit" disabled={loading} className="btn-primary w-full py-3 text-[15px]" style={{ opacity: loading ? 0.5 : 1 }}>
             {loading ? "Logging in..." : "Log in"}
           </button>

@@ -5,9 +5,14 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // stored HASHED, never plain text
+    password: { type: String, required: true },
+    isVerified: { type: Boolean, default: false },
+    verificationToken: String,
+    verificationTokenExpiry: Date,
+    resetPasswordToken: String,
+    resetPasswordExpiry: Date,
   },
-  { timestamps: true } // auto-adds createdAt / updatedAt
+  { timestamps: true }
 );
 
 export default mongoose.model("User", userSchema);
