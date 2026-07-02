@@ -2,7 +2,7 @@
 
 I got tired of reading through 80-page PDFs just to find one answer, so I built this — upload a document, ask questions in plain English, get answers back instantly.
 
-Under the hood it's a MERN stack app that passes your PDF text to Google Gemini and streams answers back through a chat interface.
+Under the hood it's a MERN stack app that passes your PDF to Google Gemini and returns answers through a chat interface. PDFs are stored on Cloudinary so the app works on serverless/ephemeral hosts too.
 
 ![stack](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white)
 ![stack](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
@@ -14,7 +14,7 @@ Under the hood it's a MERN stack app that passes your PDF text to Google Gemini 
 - Upload a PDF (up to 20 MB)
 - Ask it anything — summaries, specific facts, comparisons, whatever
 - Chat history is saved per document so you can pick up where you left off
-- Accounts are protected with JWT auth + email verification
+- Accounts are protected with JWT auth + email verification on signup
 - Forgot your password? There's a reset flow for that too
 
 ## Project layout
@@ -26,7 +26,7 @@ pdf-analyzer/
 │   ├── models/     # Mongoose schemas (User, Pdf, Chat)
 │   ├── routes/
 │   ├── middleware/
-│   └── utils/      # Email helper (nodemailer)
+│   └── utils/      # Email (nodemailer) + Cloudinary upload helpers
 └── frontend/       # React + Vite + Tailwind v4
     └── src/
         ├── pages/
@@ -35,9 +35,9 @@ pdf-analyzer/
         └── lib/      # Axios instance
 ```
 
-## Getting started
+## Running locally
 
-**Requirements:** Node >= 22, a MongoDB instance (local or Atlas), a Gemini API key, and a Gmail account for sending emails.
+**You'll need:** Node >= 22, a MongoDB instance (local or Atlas), a Gemini API key, a Gmail account, and a free Cloudinary account.
 
 ### 1. Clone and install
 
@@ -49,24 +49,37 @@ npm run install:all
 
 ### 2. Configure environment
 
-Copy the example and fill in your values:
-
 ```bash
 cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
+
+Fill in `backend/.env`:
 
 ```env
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/pdf-analyzer
+
 JWT_SECRET=make_this_something_long_and_random
+
 GEMINI_API_KEY=your_key_here
 
-# Email — use a Gmail App Password, not your real password
-# Generate one at: https://myaccount.google.com/apppasswords
+# Gmail App Password — generate at https://myaccount.google.com/apppasswords
 EMAIL_USER=you@gmail.com
 EMAIL_PASS=xxxx_xxxx_xxxx_xxxx
 
+# Cloudinary — free account at https://cloudinary.com (dashboard shows these)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
 FRONTEND_URL=http://localhost:5173
+```
+
+`frontend/.env` just needs one line:
+
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ### 3. Run
@@ -75,9 +88,7 @@ FRONTEND_URL=http://localhost:5173
 npm run dev
 ```
 
-This starts both the API (`localhost:5000`) and the Vite dev server (`localhost:5173`) in parallel. Open your browser to **http://localhost:5173**.
-
-To run them separately:
+Starts the API on `localhost:5000` and the Vite dev server on `localhost:5173` in parallel. Open **http://localhost:5173**.
 
 ```bash
 npm run backend    # API only
@@ -86,7 +97,7 @@ npm run frontend   # React only
 
 ## API routes
 
-Auth routes (no token needed):
+Auth (no token required):
 
 | Method | Route | Description |
 |--------|-------|-------------|
@@ -104,9 +115,3 @@ PDF routes (require `Authorization: Bearer <token>`):
 | GET | `/api/pdf` | Get all your uploaded PDFs |
 | GET | `/api/pdf/:id/chat` | Fetch chat history for a PDF |
 | POST | `/api/pdf/:id/ask` | Ask a question about a PDF |
-
-## Notes
-
-- PDFs are stored on disk under `backend/uploads/` — this works fine locally but you'd want S3 or similar for any real deployment
-- Gemini's free tier has rate limits; don't be surprised if you hit them with large documents
-- Email verification tokens expire after 24 hours, reset tokens after 1 hour
