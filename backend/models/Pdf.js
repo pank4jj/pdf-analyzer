@@ -1,13 +1,12 @@
-
 import mongoose from "mongoose";
 
 const pdfSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    originalName: { type: String, required: true }, // the name the user's file had
-    storedName: { type: String, required: true },   // the name we saved it as on disk
-    path: { type: String, required: true },          // where the file lives on the server
-    size: { type: Number },                          // file size in bytes
+    originalName: { type: String, required: true },       // filename the user uploaded
+    cloudinaryUrl: { type: String, required: true },      // permanent URL to the file
+    cloudinaryPublicId: { type: String, required: true }, // needed if we ever delete it
+    size: { type: Number },                               // bytes
   },
   { timestamps: true }
 );

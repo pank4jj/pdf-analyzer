@@ -1,7 +1,9 @@
 import axios from "axios";
 
+// VITE_API_URL is set in frontend/.env for local dev
+// and in the Vercel dashboard for production.
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
 });
 
 // Before every request, attach the saved login token (if we have one).

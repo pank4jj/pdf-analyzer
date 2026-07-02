@@ -1,19 +1,26 @@
-// Handles: uploading PDFs, listing them, and asking the AI questions about them.
-import fs from "fs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Pdf from "../models/Pdf.js";
 import Chat from "../models/Chat.js";
+import { uploadBuffer } from "../utils/cloudinary.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-const fileToGeminiPart = (filePath) => ({
-  inlineData: {
-    data: fs.readFileSync(filePath).toString("base64"),
-    mimeType: "application/pdf",
-  },
-});
+/**
+ * Fetch a PDF from its Cloudinary URL and convert it to the inline
+ * data format that Gemini expects.
+ */
+const fileToGeminiPart = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Could not fetch PDF from storage.");
+  const buffer = await response.arrayBuffer();
+  return {
+    inlineData: {
+      data: Buffer.from(buffer).toString("base64"),
+      mimeType: "application/pdf",
+    },
+  };
+};
 
 export const uploadPdf = async (req, res) => {
   try {
@@ -21,11 +28,14 @@ export const uploadPdf = async (req, res) => {
       return res.status(400).json({ message: "No PDF uploaded." });
     }
 
+    // Upload the in-memory buffer straight to Cloudinary
+    const result = await uploadBuffer(req.file.buffer);
+
     const pdf = await Pdf.create({
       user: req.userId,
       originalName: req.file.originalname,
-      storedName: req.file.filename,
-      path: req.file.path,
+      cloudinaryUrl: result.secure_url,
+      cloudinaryPublicId: result.public_id,
       size: req.file.size,
     });
 
@@ -37,7 +47,6 @@ export const uploadPdf = async (req, res) => {
   }
 };
 
-
 export const listPdfs = async (req, res) => {
   try {
     const pdfs = await Pdf.find({ user: req.userId }).sort({ createdAt: -1 });
@@ -46,7 +55,6 @@ export const listPdfs = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const getChat = async (req, res) => {
   try {
@@ -64,19 +72,12 @@ export const askQuestion = async (req, res) => {
       return res.status(400).json({ message: "Question is required." });
     }
 
-
     const pdf = await Pdf.findOne({ _id: req.params.id, user: req.userId });
     if (!pdf) return res.status(404).json({ message: "PDF not found." });
 
-    if (!fs.existsSync(pdf.path)) {
-      return res.status(404).json({ message: "PDF file is missing on server." });
-    }
+    const geminiPart = await fileToGeminiPart(pdf.cloudinaryUrl);
 
-
-    const result = await model.generateContent([
-      fileToGeminiPart(pdf.path),
-      { text: question },
-    ]);
+    const result = await model.generateContent([geminiPart, { text: question }]);
     const answer = result.response.text();
 
     const chat = await Chat.findOne({ pdf: pdf._id, user: req.userId });

@@ -1,4 +1,4 @@
-import "dotenv/config"; // loads variables from .env
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
@@ -8,18 +8,21 @@ import pdfRoutes from "./routes/pdfRoutes.js";
 const app = express();
 
 // --- Middleware ---
-app.use(cors());            // lets the React frontend talk to this server
-app.use(express.json());    // lets us read JSON request bodies
+app.use(cors({
+  // In production, only allow requests from the deployed frontend.
+  // Locally FRONTEND_URL is http://localhost:5173 which also works fine.
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+}));
+app.use(express.json());
 
 // --- Routes ---
 app.use("/api/auth", authRoutes);
 app.use("/api/pdf", pdfRoutes);
 
-// A simple test route so you can check the server is alive in a browser.
-app.get("/", (req, res) => res.send("PDF Analyzer API is running ✅"));
+app.get("/", (req, res) => res.send("DocuMind API is running ✅"));
 
 // --- Start ---
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
-  app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 });
