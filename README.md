@@ -42,7 +42,7 @@ pdf-analyzer/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/pdf-analyzer.git
+git clone https://github.com/pank4jj/pdf-analyzer.git
 cd pdf-analyzer
 npm run install:all
 ```
